@@ -1,4 +1,4 @@
-# golang bit stream reader/writer
+# Golang bit stream reader/writer
 
 ```go
   r := &bits.Reader{R: stream}

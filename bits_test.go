@@ -33,7 +33,7 @@ func TestBits(t *testing.T) {
 	w.WriteBits(0x3, 4)
 	w.WriteBits(0x2, 2)
 	w.WriteBits(0x3, 2)
-	w.Write(b)
+	w.Write([]byte{0x34,0x56})
 	w.FlushBits()
 	wdata := wbuf.Bytes()
 	if wdata[0] != 0xf3 || wdata[1] != 0xb3 || wdata[2] != 0x45 || wdata[3] != 0x60 {

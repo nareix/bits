@@ -6,7 +6,7 @@ import (
 )
 
 func TestBits(t *testing.T) {
-	rdata := []byte{0xf3,0xb0}
+	rdata := []byte{0xf3,0xb3,0x45,0x60}
 	rbuf := bytes.NewReader(rdata[:])
 	r := &Reader{R: rbuf}
 	var u32 uint
@@ -22,6 +22,10 @@ func TestBits(t *testing.T) {
 	if u32, _ = r.ReadBits(2); u32 != 0x3 {
 		t.FailNow()
 	}
+	b := make([]byte, 2)
+	if r.Read(b); b[0] != 0x34 || b[1] != 0x56 {
+		t.FailNow()
+	}
 
 	wbuf := &bytes.Buffer{}
 	w := &Writer{W: wbuf}
@@ -29,9 +33,10 @@ func TestBits(t *testing.T) {
 	w.WriteBits(0x3, 4)
 	w.WriteBits(0x2, 2)
 	w.WriteBits(0x3, 2)
+	w.Write(b)
 	w.FlushBits()
 	wdata := wbuf.Bytes()
-	if wdata[0] != 0xf3 || wdata[1] != 0xb0 {
+	if wdata[0] != 0xf3 || wdata[1] != 0xb3 || wdata[2] != 0x45 || wdata[3] != 0x60 {
 		t.FailNow()
 	}
 }

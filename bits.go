@@ -43,6 +43,24 @@ func (self *Reader) ReadBits(n int) (bits uint, err error) {
 	return
 }
 
+func (self *Reader) Read(p []byte) (n int, err error) {
+	for n < len(p) {
+		want := 8
+		if len(p)-n < want {
+			want = len(p)-n
+		}
+		var bits uint64
+		if bits, err = self.ReadBits64(want*8); err != nil {
+			break
+		}
+		for i := 0; i < want; i++ {
+			p[n+i] = byte(bits>>uint((want-i-1)*8))
+		}
+		n += want
+	}
+	return
+}
+
 type Writer struct {
 	W io.Writer
 	n int
@@ -68,6 +86,16 @@ func (self *Writer) WriteBits64(bits uint64, n int) (err error) {
 
 func (self *Writer) WriteBits(bits uint, n int) (err error) {
 	return self.WriteBits64(uint64(bits), n)
+}
+
+func (self *Writer) Write(p []byte) (n int, err error) {
+	for n < len(p) {
+		if err = self.WriteBits64(uint64(p[n]), 8); err != nil {
+			return
+		}
+		n++
+	}
+	return
 }
 
 func (self *Writer) FlushBits() (err error) {

@@ -101,7 +101,10 @@ func (self *Writer) Write(p []byte) (n int, err error) {
 func (self *Writer) FlushBits() (err error) {
 	if self.n > 0 {
 		var b [8]byte
-		bits := self.bits<<uint(8-(self.n%8))
+		bits := self.bits
+		if self.n%8 != 0 {
+			bits <<= uint(8-(self.n%8))
+		}
 		want := (self.n+7)/8
 		for i := 0; i < want; i++ {
 			b[i] = byte(bits>>uint((want-i-1)*8))

@@ -1,14 +1,14 @@
 # Golang bitstream reader/writer
 
 ```go
-var reader io.Reader
+reader, _ := os.Open("input")
 r := &bits.Reader{R: reader}
 u32, err = r.ReadBits(4)
 u64, err = r.ReadBits64(4)
 p := make([]byte, 4)
 n, err = r.Read(p)
   
-var writer io.Writer
+writer, _ := os.Create("output")
 w := &bits.Writer{W: writer}
 err = w.WriteBits(0xf, 4)
 err = w.WriteBits64(0xf, 4)

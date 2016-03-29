@@ -31,7 +31,7 @@ func WriteIntBE(w io.Writer, val int, n int) (err error) {
 	} else {
 		uval = uint(val)
 	}
-	return WriteUInt(w, uval, n)
+	return WriteUIntBE(w, uval, n)
 }
 
 func WriteString(w io.Writer, val string, n int) (err error) {

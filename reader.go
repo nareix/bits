@@ -29,7 +29,7 @@ func ReadUIntBE(r io.Reader, n int) (res uint, err error) {
 func ReadIntBE(r io.Reader, n int) (res int, err error) {
 	n /= 8
 	var uval uint
-	if uval, err = ReadUInt(r, n); err != nil {
+	if uval, err = ReadUIntBE(r, n); err != nil {
 		return
 	}
 	if uval&(1<<uint(n*8-1)) != 0 {

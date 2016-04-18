@@ -1,4 +1,10 @@
 
+package bits
+
+import (
+	"io"
+)
+
 type GolombBitReader struct {
 	R    io.Reader
 	buf  [1]byte

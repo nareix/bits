@@ -46,3 +46,16 @@ func WriteString(w io.Writer, val string, n int) (err error) {
 	return WriteBytes(w, []byte(val), n)
 }
 
+func PutUInt64BE(b []byte, res uint64, n int) {
+	n /= 8
+	for i := 0; i < n; i++ {
+		b[n-i-1] = byte(res)
+		res >>= 8
+	}
+	return
+}
+
+func PutUIntBE(b []byte, res uint, n int) {
+	PutUInt64BE(b, uint64(res), n)
+}
+

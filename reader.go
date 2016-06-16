@@ -150,14 +150,14 @@ func (self IntReader) ReadInt32BE() (i int32, err error) {
 	return
 }
 
-func (self IntReader) ReadUInt32BE() (i uint, err error) {
+func (self IntReader) ReadUInt32BE() (i uint32, err error) {
 	if _, err = io.ReadFull(self.R, self.buf[0:4]); err != nil {
 		return
 	}
-	i = uint(self.buf[0])
-	i <<= 8; i |= uint(self.buf[1])
-	i <<= 8; i |= uint(self.buf[2])
-	i <<= 8; i |= uint(self.buf[3])
+	i = uint32(self.buf[0])
+	i <<= 8; i |= uint32(self.buf[1])
+	i <<= 8; i |= uint32(self.buf[2])
+	i <<= 8; i |= uint32(self.buf[3])
 	return
 }
 

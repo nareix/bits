@@ -5,8 +5,8 @@ import (
 )
 
 type Reader struct {
-	R io.Reader
-	n int
+	R    io.Reader
+	n    int
 	bits uint64
 }
 
@@ -14,7 +14,7 @@ func (self *Reader) ReadBits64(n int) (bits uint64, err error) {
 	if self.n < n {
 		var b [8]byte
 		var got int
-		want := (n-self.n+7)/8
+		want := (n - self.n + 7) / 8
 		if got, err = self.R.Read(b[:want]); err != nil {
 			return
 		}
@@ -26,10 +26,10 @@ func (self *Reader) ReadBits64(n int) (bits uint64, err error) {
 			self.bits <<= 8
 			self.bits |= uint64(b[i])
 		}
-		self.n += got*8
+		self.n += got * 8
 	}
-	bits = self.bits>>uint(self.n-n)
-	self.bits ^= bits<<uint(self.n-n)
+	bits = self.bits >> uint(self.n-n)
+	self.bits ^= bits << uint(self.n-n)
 	self.n -= n
 	return
 }
@@ -47,14 +47,14 @@ func (self *Reader) Read(p []byte) (n int, err error) {
 	for n < len(p) {
 		want := 8
 		if len(p)-n < want {
-			want = len(p)-n
+			want = len(p) - n
 		}
 		var bits uint64
-		if bits, err = self.ReadBits64(want*8); err != nil {
+		if bits, err = self.ReadBits64(want * 8); err != nil {
 			break
 		}
 		for i := 0; i < want; i++ {
-			p[n+i] = byte(bits>>uint((want-i-1)*8))
+			p[n+i] = byte(bits >> uint((want-i-1)*8))
 		}
 		n += want
 	}
@@ -62,24 +62,24 @@ func (self *Reader) Read(p []byte) (n int, err error) {
 }
 
 type Writer struct {
-	W io.Writer
-	n int
+	W    io.Writer
+	n    int
 	bits uint64
 }
 
 func (self *Writer) WriteBits64(bits uint64, n int) (err error) {
 	if self.n+n > 64 {
-		move := uint(64-self.n)
-		mask := bits>>move
-		self.bits = (self.bits<<move)|mask
+		move := uint(64 - self.n)
+		mask := bits >> move
+		self.bits = (self.bits << move) | mask
 		self.n = 64
 		if err = self.FlushBits(); err != nil {
 			return
 		}
 		n -= int(move)
-		bits ^= (mask<<move)
+		bits ^= (mask << move)
 	}
-	self.bits = (self.bits<<uint(n))|bits
+	self.bits = (self.bits << uint(n)) | bits
 	self.n += n
 	return
 }
@@ -103,11 +103,11 @@ func (self *Writer) FlushBits() (err error) {
 		var b [8]byte
 		bits := self.bits
 		if self.n%8 != 0 {
-			bits <<= uint(8-(self.n%8))
+			bits <<= uint(8 - (self.n % 8))
 		}
-		want := (self.n+7)/8
+		want := (self.n + 7) / 8
 		for i := 0; i < want; i++ {
-			b[i] = byte(bits>>uint((want-i-1)*8))
+			b[i] = byte(bits >> uint((want-i-1)*8))
 		}
 		if _, err = self.W.Write(b[:want]); err != nil {
 			return
@@ -116,4 +116,3 @@ func (self *Writer) FlushBits() (err error) {
 	}
 	return
 }
-

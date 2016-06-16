@@ -1,4 +1,3 @@
-
 package bits
 
 import (
@@ -29,7 +28,7 @@ func GetUIntBE(b []byte, n int) (res uint) {
 func GetInt64BE(b []byte, n int) (res int64) {
 	uval := GetUInt64BE(b, n)
 	if uval&(1<<uint64(n-1)) != 0 {
-		res = -int64((1<<uint64(n))-uval)
+		res = -int64((1 << uint64(n)) - uval)
 	} else {
 		res = int64(uval)
 	}
@@ -81,61 +80,117 @@ func ReadString(r io.Reader, n int) (res string, err error) {
 	return
 }
 
-type NumReader struct {
-	R io.Reader
+type IntReader struct {
+	R   io.Reader
 	buf []byte
 }
 
-func (self NumReader) ReadInt8() (i int, err error) {
+func (self IntReader) ReadInt8() (i int8, err error) {
 	if _, err = io.ReadFull(self.R, self.buf[0:1]); err != nil {
 		return
 	}
-	i = int(self.buf[0])
+	i = int8(self.buf[0])
 	return
 }
 
-func (self NumReader) ReadInt16BE() (i int, err error) {
+func (self IntReader) ReadUInt8() (i uint8, err error) {
+	if _, err = io.ReadFull(self.R, self.buf[0:1]); err != nil {
+		return
+	}
+	i = uint8(self.buf[0])
+	return
+}
+
+func (self IntReader) ReadInt16BE() (i int16, err error) {
 	if _, err = io.ReadFull(self.R, self.buf[0:2]); err != nil {
 		return
 	}
-	i = int(self.buf[1])
-	i |= int(self.buf[0])<<8
+	i = int16(int8(self.buf[0]))
+	i <<= 8; i |= int16(self.buf[1])
 	return
 }
 
-func (self NumReader) ReadInt24BE() (i int, err error) {
+func (self IntReader) ReadUInt16BE() (i uint16, err error) {
+	if _, err = io.ReadFull(self.R, self.buf[0:2]); err != nil {
+		return
+	}
+	i = uint16(self.buf[0])
+	i <<= 8; i |= uint16(self.buf[1])
+	return
+}
+
+func (self IntReader) ReadInt24BE() (i int32, err error) {
 	if _, err = io.ReadFull(self.R, self.buf[0:3]); err != nil {
 		return
 	}
-	i = int(self.buf[2])
-	i |= int(self.buf[0])<<16
-	i |= int(self.buf[1])<<8
+	i = int32(int8(self.buf[0]))
+	i <<= 8; i |= int32(self.buf[1])
+	i <<= 8; i |= int32(self.buf[2])
 	return
 }
 
-func (self NumReader) ReadInt32BE() (i int, err error) {
+func (self IntReader) ReadUInt24BE() (i uint32, err error) {
+	if _, err = io.ReadFull(self.R, self.buf[0:3]); err != nil {
+		return
+	}
+	i = uint32(self.buf[0])
+	i <<= 8; i |= uint32(self.buf[1])
+	i <<= 8; i |= uint32(self.buf[2])
+	return
+}
+
+func (self IntReader) ReadInt32BE() (i int32, err error) {
 	if _, err = io.ReadFull(self.R, self.buf[0:4]); err != nil {
 		return
 	}
-	i = int(self.buf[3])
-	i |= int(self.buf[0])<<24
-	i |= int(self.buf[1])<<16
-	i |= int(self.buf[2])<<8
+	i = int32(int8(self.buf[0]))
+	i <<= 8; i |= int32(self.buf[1])
+	i <<= 8; i |= int32(self.buf[2])
+	i <<= 8; i |= int32(self.buf[3])
 	return
 }
 
-func (self NumReader) Read(p []byte) (i int, err error) {
+func (self IntReader) ReadUInt32BE() (i uint, err error) {
+	if _, err = io.ReadFull(self.R, self.buf[0:4]); err != nil {
+		return
+	}
+	i = uint(self.buf[0])
+	i <<= 8; i |= uint(self.buf[1])
+	i <<= 8; i |= uint(self.buf[2])
+	i <<= 8; i |= uint(self.buf[3])
+	return
+}
+
+func (self IntReader) ReadUInt64BE() (i uint64, err error) {
+	if _, err = io.ReadFull(self.R, self.buf[0:8]); err != nil {
+		return
+	}
+	i = uint64(self.buf[0])
+	i <<= 8; i |= uint64(self.buf[1])
+	i <<= 8; i |= uint64(self.buf[2])
+	i <<= 8; i |= uint64(self.buf[3])
+	i <<= 8; i |= uint64(self.buf[4])
+	i <<= 8; i |= uint64(self.buf[5])
+	i <<= 8; i |= uint64(self.buf[6])
+	i <<= 8; i |= uint64(self.buf[7])
+	return
+}
+
+
+func (self IntReader) Read(p []byte) (i int, err error) {
 	return self.R.Read(p)
 }
 
-func (self NumReader) Skip(n int) (err error) {
+var discardBuf = make([]byte, 4096)
+
+func (self IntReader) Skip(n int) (err error) {
 	for n > 0 {
-		s := n
-		if s > len(self.buf) {
-			s = len(self.buf)
-		}
 		var r int
-		if r, err = self.Read(self.buf[:s]); err != nil {
+		s := n
+		if s > len(discardBuf) {
+			s = len(discardBuf)
+		}
+		if r, err = self.R.Read(discardBuf[:s]); err != nil {
 			return
 		}
 		n -= r
@@ -143,7 +198,7 @@ func (self NumReader) Skip(n int) (err error) {
 	return
 }
 
-func NewNumReader(r io.Reader) NumReader {
-	return NumReader{R: r, buf: make([]byte, 8)}
+func NewIntReader(r io.Reader) IntReader {
+	return IntReader{R: r, buf: make([]byte, 8)}
 }
 

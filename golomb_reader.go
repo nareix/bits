@@ -1,4 +1,3 @@
-
 package bits
 
 import (
@@ -64,4 +63,3 @@ func (self *GolombBitReader) ReadSE() (res uint, err error) {
 	}
 	return
 }
-

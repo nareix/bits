@@ -1,12 +1,12 @@
 package bits
 
 import (
-	"testing"
 	"bytes"
+	"testing"
 )
 
 func TestBits(t *testing.T) {
-	rdata := []byte{0xf3,0xb3,0x45,0x60}
+	rdata := []byte{0xf3, 0xb3, 0x45, 0x60}
 	rbuf := bytes.NewReader(rdata[:])
 	r := &Reader{R: rbuf}
 	var u32 uint
@@ -33,7 +33,7 @@ func TestBits(t *testing.T) {
 	w.WriteBits(0x3, 4)
 	w.WriteBits(0x2, 2)
 	w.WriteBits(0x3, 2)
-	n, _ := w.Write([]byte{0x34,0x56})
+	n, _ := w.Write([]byte{0x34, 0x56})
 	if n != 2 {
 		t.FailNow()
 	}
@@ -49,4 +49,3 @@ func TestBits(t *testing.T) {
 		t.FailNow()
 	}
 }
-
